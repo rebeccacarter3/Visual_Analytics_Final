@@ -29,7 +29,38 @@ player_page_button = st.sidebar.button(
 players = pd.read_csv('skaters 23-24.csv')
 carolina_players = players[players['team'] == 'CAR']
 carolina_players_all_situations = carolina_players[carolina_players['situation'] == 'all']
-# carolina_players = carolina_players.rename(columns={'name': 'Name'}, inplace=True)
+
+#create photo list
+photos = ["https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/KK.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Drury.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/DeAngelo.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Turbo.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Kuznetsov.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Staal.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Necas.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Noesen.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Martinook.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Ponomarev.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Burns.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Burke.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Coghlan.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Brady%20Skjei.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Guentzel.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Slavin.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Fast.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Nadeau.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Svech.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Morrow.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Jarvis.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Aho.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Orlov.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Blake.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Comtois.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Chatfield.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Lemieux.png",
+        "https://raw.githubusercontent.com/hwillif/Visual_Analytics_Final/refs/heads/main/Player_Photos/Pesce.png"]
+
+carolina_players_all_situations['photos'] = photos
 
 # Create Home Page
 def home_page():
@@ -59,35 +90,45 @@ def player_page():
     # total_goals_assists = carolina_players.groupby(['name']).agg({'I_F_goals': ['sum'],'I_F_primaryAssists': ['sum'],'I_F_secondaryAssists': ['sum']}).reset_index()
     # total_goals_assists = total_goals_assists.assign(Assists = total_goals_assists['I_F_primaryAssists'] + total_goals_assists['I_F_secondaryAssists'])
     # total_goals_assists.columns = ['Goals', 'Primary Assists', 'Secondary Assists', 'Total Assists']
-    st.dataframe(data=carolina_players_all_situations)
+    
 
-    total_goals_assists = carolina_players_all_situations[['name', 'position', 'I_F_goals', 'I_F_primaryAssists', 'I_F_secondaryAssists']] 
+    total_goals_assists = carolina_players_all_situations[['name', 'position', 'I_F_goals', 'I_F_primaryAssists', 'I_F_secondaryAssists', 'photos']] 
     total_goals_assists = total_goals_assists.assign(Assists = total_goals_assists['I_F_primaryAssists'] + total_goals_assists['I_F_secondaryAssists'])
-    total_goals_assists.columns = ['Name', 'Position', 'Goals', 'Primary Assists', 'Secondary Assists', 'Total Assists']
+    total_goals_assists.columns = ['Name', 'Position', 'Goals', 'Primary Assists', 'Secondary Assists', 'Photos', 'Total Assists']
+    # st.dataframe(data=carolina_players_all_situations)
+    # st.dataframe(data=total_goals_assists)
 
     # create scatter plot of goals vs assists
-    # goals_assists_scatterplot = alt.Chart(total_goals_assists).mark_point().encode(
-    #     x='Total Assists',
-    #     y='Goals',
-    #     color='Position'
-    # ) 
-    # data_labels1 = goals_assists_scatterplot.mark_text(
-    #     align='left',
-    #     baseline='middle',
-    #     dx=7
-    # ).encode(
-    #     text='Name'
-    # )
-    # scatterplot1 = goals_assists_scatterplot + data_labels1
-    # st.altair_chart(scatterplot1, use_container_width=True)
+    goals_assists_scatterplot = alt.Chart(total_goals_assists).mark_point().encode(
+        x='Total Assists',
+        y='Goals',
+        color='Position'
+    ) 
+    data_labels1 = goals_assists_scatterplot.mark_text(
+        align='left',
+        baseline='middle',
+        dx=7
+    ).encode(
+        text='Name'
+    )
+    scatterplot1 = goals_assists_scatterplot + data_labels1
+    st.altair_chart(scatterplot1, use_container_width=True)
 
-    goals_assists_scatterplot = alt.Chart(total_goals_assists).mark_text().encode(
+    goals_assists_scatterplot1 = alt.Chart(total_goals_assists).mark_text(dy=45).encode(
+        text="Name",
+        x="Total Assists",
+        y="Goals"
+    )
+    st.altair_chart(goals_assists_scatterplot1, use_container_width=True)
+
+    photo_scatter = alt.Chart(total_goals_assists).mark_image(width=75, height=75).encode(
         x="Total Assists",
         y="Goals",
-        color="Position",
-        text="Name",
+        url= 'Photos',
+        tooltip= alt.Tooltip(field = "Name")
     )
-    st.altair_chart(goals_assists_scatterplot, use_container_width=True)
+    st.altair_chart(photo_scatter + goals_assists_scatterplot1, use_container_width=True)
+
     
 
 # Page Navigation
