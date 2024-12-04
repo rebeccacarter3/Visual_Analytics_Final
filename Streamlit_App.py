@@ -114,12 +114,11 @@ def player_page():
     scatterplot1 = goals_assists_scatterplot + data_labels1
     st.altair_chart(scatterplot1, use_container_width=True)
 
-    goals_assists_scatterplot1 = alt.Chart(total_goals_assists).mark_text(dy=45).encode(
+    goals_assists_text = alt.Chart(total_goals_assists).mark_text(dy=45).encode(
         text="Name",
         x="Total Assists",
         y="Goals"
     )
-    st.altair_chart(goals_assists_scatterplot1, use_container_width=True)
 
     photo_scatter = alt.Chart(total_goals_assists).mark_image(width=75, height=75).encode(
         x="Total Assists",
@@ -127,7 +126,7 @@ def player_page():
         url= 'Photos',
         tooltip= alt.Tooltip(field = "Name")
     )
-    st.altair_chart(photo_scatter + goals_assists_scatterplot1, use_container_width=True)
+    st.altair_chart(photo_scatter + goals_assists_text, use_container_width=True)
 
     
 
