@@ -87,11 +87,13 @@ def home_page():
 def player_page():
     st.title('Individual Player Performance')
 
+    # Create GoalsxAssists Scatter Plot
+    # Text Above Scatter Plot
+    st.write("Player Goals vs Assists")
     # total_goals_assists = carolina_players.groupby(['name']).agg({'I_F_goals': ['sum'],'I_F_primaryAssists': ['sum'],'I_F_secondaryAssists': ['sum']}).reset_index()
     # total_goals_assists = total_goals_assists.assign(Assists = total_goals_assists['I_F_primaryAssists'] + total_goals_assists['I_F_secondaryAssists'])
     # total_goals_assists.columns = ['Goals', 'Primary Assists', 'Secondary Assists', 'Total Assists']
     
-
     total_goals_assists = carolina_players_all_situations[['name', 'position', 'I_F_goals', 'I_F_primaryAssists', 'I_F_secondaryAssists', 'photos']] 
     total_goals_assists = total_goals_assists.assign(Assists = total_goals_assists['I_F_primaryAssists'] + total_goals_assists['I_F_secondaryAssists'])
     total_goals_assists.columns = ['Name', 'Position', 'Goals', 'Primary Assists', 'Secondary Assists', 'Photos', 'Total Assists']
