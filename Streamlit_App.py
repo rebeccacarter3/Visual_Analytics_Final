@@ -360,7 +360,7 @@ def player_page():
     # Filter Dataset based on names selected
     filtered_df1 = carolina_players_all_situations[carolina_players_all_situations['name'].isin(selected_name_var)]
     filtered_df1 = filtered_df1.sort_values('name', key=lambda x: pd.Categorical(x, categories=selected_name_var, ordered=True))
-    st.dataframe(filtered_df1)
+    
     #create columns
     col1, col2 = st.columns(2)
     with col1:
