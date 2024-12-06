@@ -27,16 +27,16 @@ home_page_button = st.sidebar.button(
     "Home".upper(), on_click=switch_page, args=["home_page"]
 )
 
+team_stats_buttom = st.sidebar.button(
+    "Team Stats".upper(), on_click=switch_page, args=["team_stats"]
+)
+
 player_page_button = st.sidebar.button(
     "Player Performance".upper(), on_click=switch_page, args=["player_page"]
 )
 
 compare_page_buttom = st.sidebar.button(
     "Player Comparison".upper(), on_click=switch_page, args=["compare_page"]
-)
-
-team_stats_buttom = st.sidebar.button(
-    "Team Stats".upper(), on_click=switch_page, args=["team_stats"]
 )
 
 #Import Players Data
@@ -495,6 +495,8 @@ def team_stats():
     # Create win stat
     team_data['game_result'] = team_data.apply(lambda row: 1 if row['goalsFor'] > row['goalsAgainst'] 
                         else (0 if row['goalsFor'] < row['goalsAgainst'] else .5), axis=1)
+    team_data['game_result_text'] = team_data.apply(lambda row: 'won' if row['goalsFor'] > row['goalsAgainst'] 
+                    else ('lost' if row['goalsFor'] < row['goalsAgainst'] else 'ot'), axis=1)
 
     # Add month column
     team_data['month'] = team_data['gameDate'].dt.to_period('M')  # Convert date to period (month)
@@ -574,32 +576,34 @@ def team_stats():
     # Month Order
     month_order = ['October','November','December','January','February','March','April','May','June']
     result_order = ['Won','Lost','OT','Should Have Lost','Should Have Won']
-    
+
+    # Get number of games in a month per game outcome
+    game_counts = team_data.groupby(['month','game_outcome'])['gameId'].count().reset_index(name='game_count_per_result')
+    team_data = team_data.merge(game_counts, on=['month','game_outcome'], how='left')
+
     # Create Header for HeatMap
     st.subheader("**Team Performance throughout the Season**", divider='red')
-    
     # Create HeatMap over months for win%
     heatmap = alt.Chart(team_data).mark_rect().encode(
         alt.X("game_outcome", sort=result_order).axis(labelAngle=0, orient='top').title("Game Outcome"),
         alt.Y("month(gameDate):O", sort= month_order).title("Month"),
-        color = alt.Color('Expected Goal %',legend=alt.Legend(orient='bottom', title="Expected Goal Percentage")).title("Expected Goal %"),
-    )
-    heatmap_color= heatmap.mark_bar().encode(
-        color=alt.Color('Expected Goal %').title("Expected Goal %"),
-    )
-    heatmap_text = heatmap.mark_text().encode(
-        text ='Expected Goal %'
+        color = alt.Color('Expected Goal %',legend=alt.Legend(orient='bottom', title="Expected Goal Percentage",)).title("Expected Goal %"),
+        tooltip=[
+            'game_outcome:N', 
+            'month(gameDate):O',
+            alt.Tooltip('Expected Goal %:Q', title='Expected Goal %'),
+            alt.Tooltip('game_count_per_result', title='Game Count')
+        ]
     )
     st.altair_chart(heatmap, use_container_width=True)
    
     
-
 # Page Navigation
 fn_map = {
-    "home_page": home_page,
-    "player_page": player_page,
-    "compare_page": compare_page,
-    "team_stats": team_stats
+    "home_page": home_page
+    , "player_page": player_page
+    , "compare_page": compare_page 
+    , "team_stats": team_stats
 }
 main_window = st.container()
 main_workflow = fn_map.get(st.session_state.current_page, home_page)
