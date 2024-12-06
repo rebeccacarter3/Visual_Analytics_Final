@@ -7,7 +7,7 @@ import string
 import random
 
 # Sidebar
-st.set_page_config(layout = "wide", initial_sidebar_state='collapsed')
+st.set_page_config(layout = "wide", initial_sidebar_state='expanded')
 st.sidebar.subheader("Navigation")
 
 # Initalizes the current page in the session state if it does not exist
@@ -153,7 +153,8 @@ def player_page():
         # index=names.index(st.session_state.selected_name_var) if st.session_state.selected_name_var else 0
         max_selections=10,
         placeholder = 'Choose a Player',
-        default = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov']     
+        # default = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov'] 
+        default = selected_name_var    
     )
     length_selected_names = len(selected_name_var)
     # create loop for dynamic columns based on length of selected names list
@@ -360,7 +361,7 @@ def player_page():
     # Filter Dataset based on names selected
     filtered_df1 = carolina_players_all_situations[carolina_players_all_situations['name'].isin(selected_name_var)]
     filtered_df1 = filtered_df1.sort_values('name', key=lambda x: pd.Categorical(x, categories=selected_name_var, ordered=True))
-    
+
     #create columns
     col1, col2 = st.columns(2)
     with col1:
