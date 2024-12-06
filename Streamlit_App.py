@@ -31,13 +31,22 @@ player_page_button = st.sidebar.button(
     "Player Performance".upper(), on_click=switch_page, args=["player_page"]
 )
 
+compare_page_buttom = st.sidebar.button(
+    "Player Comparison".upper(), on_click=switch_page, args=["compare_page"]
+)
+
+team_stats_buttom = st.sidebar.button(
+    "Team Stats".upper(), on_click=switch_page, args=["team_stats"]
+)
+
 #Import Players Data
 players = pd.read_csv('skaters 23-24.csv')
 carolina_players = players[players['team'] == 'CAR']
 carolina_players_all_situations = carolina_players[carolina_players['situation'] == 'all']
+carolina_players_other_situations = carolina_players[carolina_players['situation'] != 'all']
 
 # Add Metrics to Carolina Players
-carolina_players_all_situations['Expected Goal %'] = round(carolina_players_all_situations["I_F_goals"] / carolina_players_all_situations['I_F_xGoals'],3)
+carolina_players_all_situations['Expected Goal %'] = round(carolina_players_all_situations['I_F_goals'] / carolina_players_all_situations['I_F_xGoals'],3)
 carolina_players_all_situations['Finishing Expected High Danger %'] = round(carolina_players_all_situations['I_F_highDangerGoals'] / carolina_players_all_situations['I_F_highDangerxGoals'],3)
 carolina_players_all_situations['On Ice +/-'] = carolina_players_all_situations['OnIce_F_goals'] - carolina_players_all_situations['OnIce_A_goals']
 
@@ -94,13 +103,13 @@ def home_page():
     st.write('**Points:** :gray[A goal is worth 1 point and an assist is worth 1 point.]')
     st.write('**+/-:** :gray[The goal differential when a player is on the Ice.]')
 
-# Create Second Page
+# Create Second Page (Player Page)
 def player_page():
-    st.title('Individual Player Performance')
+    st.title(':red[Individual Player Performance]')
 
     # Create GoalsxAssists Scatter Plot
     # Text Above Scatter Plot
-    st.write(":red[Player Goals vs Assists]")
+    st.subheader("Player Goals vs Assists", divider='red')
         
     # Create dataframe for the GoalsxAssists scatterplot
     total_goals_assists = carolina_players_all_situations[['name', 'position', 'I_F_goals', 'I_F_primaryAssists', 'I_F_secondaryAssists', 'photos']] 
@@ -142,8 +151,38 @@ def player_page():
     # Print Chart with Names and Photos
     st.altair_chart(photo_scatter + goals_assists_text, use_container_width=True)
 
+    # Create on Ice +/- Bar Chart
+    st.subheader('**On Ice Impact (+/-)**', divider='red')
+    carolina_players_all_situations['plusminus'] = carolina_players_all_situations['On Ice +/-']
+    plusminus_chart = alt.Chart(carolina_players_all_situations).mark_bar().encode(
+        x=alt.X('name', axis=alt.Axis(labelAngle=-90,title="")).sort('-y').title("Name"),
+        y='On Ice +/-',
+        color=alt.Color('position').title("Player Position")
+    )
+
+    #function for above or below functions
+    above = alt.datum.num_cars > 100
+
+        # Created Data Labels Chart for Player Expected Goal %
+    plusminus_text = plusminus_chart.mark_text(
+        baseline='middle',
+        dy= alt.expr(alt.expr.if_(alt.datum.plusminus >= 0, -5, 7.5))       
+    ).encode(
+        text ='On Ice +/-'
+    )
+    # Combine Chart and Data Labels into Layers
+    bar_chart1 = (plusminus_chart + plusminus_text
+    ).properties(
+    height=350
+    )
+    st.altair_chart(bar_chart1, use_container_width=True)
+
+
+# Create third page (comparison page)
+def compare_page():
+
     # Create Second Section
-    st.subheader("Player Performance Comparisons", divider="red")
+    st.title(":red[Player Shooting Comparisons]")
     
     #create multiselect drop down
     names = carolina_players_all_situations['name'].tolist()
@@ -153,9 +192,10 @@ def player_page():
         # index=names.index(st.session_state.selected_name_var) if st.session_state.selected_name_var else 0
         max_selections=10,
         placeholder = 'Choose a Player',
-        # default = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov'] 
-        default = selected_name_var    
+        default = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov']  
     )
+
+
     length_selected_names = len(selected_name_var)
     # create loop for dynamic columns based on length of selected names list
     def autocolumn(i):
@@ -358,14 +398,14 @@ def player_page():
     # store selected values in session state
     st.session_state.selected_name_var = selected_name_var
 
-    # Filter Dataset based on names selected
+    # Filter Dataset1 based on names selected
     filtered_df1 = carolina_players_all_situations[carolina_players_all_situations['name'].isin(selected_name_var)]
     filtered_df1 = filtered_df1.sort_values('name', key=lambda x: pd.Categorical(x, categories=selected_name_var, ordered=True))
 
     #create columns
     col1, col2 = st.columns(2)
     with col1:
-        st.write("**:red[Player Expected Goal %]**")
+        st.subheader("**Player Expected Goal Percentage**",divider='red',)
         # Bar Chart to compare Goals / Expected Goals
         expected_goal_chart = alt.Chart(filtered_df1).mark_bar().encode(
             x=alt.X('name', axis=alt.Axis(labelAngle=-90,title=""), sort = filtered_df1['name']).title("Name"),
@@ -387,7 +427,7 @@ def player_page():
         )
         st.altair_chart(bar_chart1, use_container_width=True)
     with col2:
-        st.write("**:red[Player Expected High Danger Goals Percentage]**")
+        st.subheader("**Player Expected High Danger Goals Percentage**",divider='red')
         # Bar Chart to compare High Danger Goals / Expected High Danger Goals
         high_danger_chart = alt.Chart(filtered_df1).mark_bar().encode(
             x=alt.X('name', axis=alt.Axis(labelAngle=-90,title=""), sort = filtered_df1['name']).title("Name"),
@@ -409,23 +449,157 @@ def player_page():
         )
         st.altair_chart(bar_chart2, use_container_width=True)
     
-    # Create on Ice +/- Bar Chart
-    st.write('**:red[On Ice Impact (+/-)]**')
-    bar_chart3 = alt.Chart(carolina_players_all_situations).mark_bar().encode(
-        x=alt.X('name', axis=alt.Axis(labelAngle=-90,title="")).sort('-y').title("Name"),
-        y='On Ice +/-',
-        color=alt.Color('position').title("Player Position")
-    ).properties(
-    height=350
-    )
-    st.altair_chart(bar_chart3, use_container_width=True)   
+    # Filter Dataset2 based on names selected
+    filtered_df2 = carolina_players_other_situations[carolina_players_other_situations['name'].isin(selected_name_var)]
+    filtered_df2 = filtered_df2.sort_values('name', key=lambda x: pd.Categorical(x, categories=selected_name_var, ordered=True))
+    filtered_df2.rename(columns={'I_F_goals': 'Goals'}, inplace=True)
 
+    # Create Other Situations Goals and Assists
+    st.subheader("**Goals in Different Scenarios**",divider='red')
+    # Bar Chart to compare High Danger Goals / Expected High Danger Goals
+    situationschart = alt.Chart(filtered_df2).encode(
+        x=alt.X('name', axis=alt.Axis(labelAngle=-90,title=""), sort = filtered_df1['name']).title("Name"),
+        xOffset='situation',
+        y='Goals',
+    ) 
+    situationschart_color = situationschart.mark_bar().encode(
+        color=alt.Color('situation:N'),
+    )
+    # Created Data Labels Chart for Goals In All situations
+    situationschart_text = situationschart.mark_text(
+        baseline='middle', 
+        dx=5,
+        dy=-5,
+    ).encode(
+        text ='Goals'
+    )
+    # Print Goals in Situations 
+    st.altair_chart(situationschart_color+situationschart_text, use_container_width=True)  
+ 
+def team_stats():
+    # create team stats dataframe for the 2023/2024 Season. Could do all years but this site is focused on one season.
+    team_data = pd.read_csv('Carolina Hurricanes.csv')
+    
+    # remove duplicate data in other situations
+    team_data = team_data[team_data['situation'] == 'all'] 
+    
+    #only select 2023 season
+    team_data = team_data[team_data['season'] == 2023]
+    
+    #format game date
+    team_data['gameDate'] = pd.to_datetime(team_data['gameDate'], format='%Y%m%d')
+    
+    # Create Expected Goal % Rate
+    team_data['Expected Goal %'] = round(team_data['goalsFor'] / team_data['xGoalsFor'],3)
+    
+    # Create win stat
+    team_data['game_result'] = team_data.apply(lambda row: 1 if row['goalsFor'] > row['goalsAgainst'] 
+                        else (0 if row['goalsFor'] < row['goalsAgainst'] else .5), axis=1)
+
+    # Add month column
+    team_data['month'] = team_data['gameDate'].dt.to_period('M')  # Convert date to period (month)
+
+    # get team info 
+    team_info = pd.read_csv('NHL Teams.csv')
+    team_info = team_info[['abbreviation', 'division/name']]
+    team_info['division'] = team_info['division/name']
+
+    # merge team_data and info to get the division
+    team_data = pd.merge(team_data, team_info, left_on='opposingTeam', right_on='abbreviation', how='left')
+
+    # Add a title to the page
+    st.title("**:red[Team Shooting Performance]**")
+
+        # Create Win Percentage Chart vs Teams
+    st.subheader('**Win Percentages against other Teams**', divider='red')
+    # Create table
+    win_percentages = team_data.groupby('opposingTeam').agg(
+        total_games=('game_result', 'size'),
+        total_wins=('game_result', 'sum')
+    ).reset_index()
+    # Create win percentage metric
+    win_percentages['win_percentage'] = (win_percentages['total_wins'] / win_percentages['total_games'])
+    
+    # Order the divisions in a list
+    division_order = ['Metropolitan', 'Atlantic', 'Central', 'Pacific']
+    
+    # merge to get division name
+    win_percentages = pd.merge(win_percentages, team_info, left_on='opposingTeam', right_on='abbreviation', how='left')
+    win_percentages['division'] = pd.Categorical(win_percentages['division'], categories=division_order, ordered=True)
+    win_percentages = win_percentages.sort_values(by=['division', 'win_percentage'], ascending=[True, False])
+    
+    # Get unique team names in division order
+    team_order = win_percentages['opposingTeam'].unique()
+
+    # create bar chart for win percentages against other teams
+    win_perc_chart = alt.Chart(win_percentages).mark_bar().encode(
+        x=alt.X('opposingTeam:N', title='Team', sort=team_order),
+        y=alt.Y('win_percentage:Q', title='Win Percentage', axis=alt.Axis(format='.0%')),
+        color=alt.Color('division', scale=alt.Scale(scheme='category10')), 
+        tooltip=['opposingTeam:N', 'win_percentage:Q']  # Display win percentage on hover
+    ).configure_view(
+        stroke=None  
+    )
+    # print chart for win percentages against other teams
+    st.altair_chart(win_perc_chart)
+
+    # Add a header to the linechart
+    st.subheader("**Team Expected Goal Percentage**", divider="red")
+    # create line chart for expected goal %
+    linechart = alt.Chart(team_data).mark_line(color='red').encode(
+        x=alt.X('gameDate', axis=alt.Axis(title='Game Date', labelAngle=-45)),
+        y='Expected Goal %',
+    )
+    reference_line = alt.Chart(pd.DataFrame({'y': [1]})).mark_rule(color='black').encode(
+        y=alt.Y('y:Q', axis=alt.Axis(title='Expected Goal %')),
+    )
+    # Print the line chart and reference line
+    st.altair_chart(linechart+reference_line, use_container_width=True)
+
+    # create function to determine game result
+    def game_outcome(row):
+        if row['goalsFor'] > row['goalsAgainst'] and row['xGoalsFor'] > row['xGoalsAgainst']:
+            return 'Won'
+        elif row['goalsFor'] < row['goalsAgainst'] and row['xGoalsFor'] < row['xGoalsAgainst']:
+            return 'Lost'
+        elif row['goalsFor'] < row['goalsAgainst'] and row['xGoalsFor'] > row['xGoalsAgainst']:
+            return 'Should Have Won'
+        elif row['goalsFor'] > row['goalsAgainst'] and row['xGoalsFor'] < row['xGoalsAgainst']:
+            return 'Should Have Lost'
+        else:    
+            return 'OT'
+        
+    team_data['game_outcome'] = team_data.apply(game_outcome, axis=1)
+
+    # Month Order
+    month_order = ['October','November','December','January','February','March','April','May','June']
+    result_order = ['Won','Lost','OT','Should Have Lost','Should Have Won']
+    
+    # Create Header for HeatMap
+    st.subheader("**Team Performance throughout the Season**", divider='red')
+    
+    # Create HeatMap over months for win%
+    heatmap = alt.Chart(team_data).mark_rect().encode(
+        alt.X("game_outcome", sort=result_order).axis(labelAngle=0, orient='top').title("Game Outcome"),
+        alt.Y("month(gameDate):O", sort= month_order).title("Month"),
+        color = alt.Color('Expected Goal %',legend=alt.Legend(orient='bottom', title="Expected Goal Percentage")).title("Expected Goal %"),
+    )
+    heatmap_color= heatmap.mark_bar().encode(
+        color=alt.Color('Expected Goal %').title("Expected Goal %"),
+    )
+    heatmap_text = heatmap.mark_text().encode(
+        text ='Expected Goal %'
+    )
+    st.altair_chart(heatmap, use_container_width=True)
+   
     
 
 # Page Navigation
 fn_map = {
     "home_page": home_page,
-    "player_page": player_page
+    "player_page": player_page,
+    "compare_page": compare_page,
+    "team_stats": team_stats
 }
 main_window = st.container()
 main_workflow = fn_map.get(st.session_state.current_page, home_page)
