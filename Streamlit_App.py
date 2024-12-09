@@ -16,7 +16,7 @@ if "current_page" not in st.session_state:
 
 # initialized the name filter selection in session state (chart 2 player page)
 if "selected_name_var" not in st.session_state:
-    st.session_state.selected_name_var = None
+    st.session_state.selected_name_var = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov']  # Default players
 
 #Create Sidebar Buttons Action
 def switch_page(page: str):
@@ -185,242 +185,65 @@ def player_page():
 
 # Create third page (comparison page)
 def compare_page():
-
     # Create Second Section
     st.title(":red[Player Shooting Comparisons]")
     
-    #create multiselect drop down
+    # Create multiselect drop-down
     names = carolina_players_all_situations['name'].tolist()
+
+    # Check if session state is already set for selected players
+    if st.session_state.selected_name_var is None:
+        st.session_state.selected_name_var = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov']
+
+    # Use session state as default for the multiselect
     selected_name_var = st.multiselect(
         "**Select Players to Compare:**",
         names,
-        # index=names.index(st.session_state.selected_name_var) if st.session_state.selected_name_var else 0
+        default=st.session_state.selected_name_var,
         max_selections=10,
-        placeholder = 'Choose a Player',
-        default = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov']  
-    ) 
+        placeholder='Choose a Player',
+    )
 
+    # Update session state with the selected players
+    st.session_state.selected_name_var = selected_name_var
+
+    # Number of selected players
     length_selected_names = len(selected_name_var)
-    # create loop for dynamic columns based on length of selected names list
+
+    # Create loop for dynamic columns based on the number of selected names
     def autocolumn(i):
-        temp1=[]
-        for x in range(i):
-            temp1.append(random.choice(string.ascii_uppercase)+str(length_selected_names))
-        if i == 1:
-            loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-            st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-                        
-        if i == 2:
-            temp1[0:1]=st.columns(2)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-
-        elif i == 3:
-            temp1[0:2]=st.columns(3)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-        elif i == 4:
-            temp1[0:3]=st.columns(4)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[3]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[3])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-        elif i == 5:
-            temp1[0:4]=st.columns(5)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[3]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[3])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[4]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[4])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-        
-        elif i == 6:
-            temp1[0:5]=st.columns(6)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[3]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[3])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[4]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[4])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[5]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[5])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-
-        elif i == 7:
-            temp1[0:6]=st.columns(7)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[3]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[3])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[4]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[4])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[5]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[5])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[6]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[6])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-        
-        elif i == 8:
-            temp1[0:7]=st.columns(8)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[3]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[3])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[4]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[4])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[5]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[5])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[6]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[6])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[7]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[7])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-        
-        elif i == 9:
-            temp1[0:8]=st.columns(9)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[3]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[3])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[4]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[4])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[5]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[5])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[6]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[6])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[7]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[7])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[8]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[8])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-        
-        elif i == 10:
-            temp1[0:9]=st.columns(10)
-            with temp1[0]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[0])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[1]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[1])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[2]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[2])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[3]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[3])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[4]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[4])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[5]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[5])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[6]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[6])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[7]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[7])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[8]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[8])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
-            with temp1[9]:
-                loop_df = carolina_players_all_situations[carolina_players_all_situations['name'].str.contains(selected_name_var[9])]
-                st.image(loop_df['photos'].loc[loop_df.index[0]], width = 100)
+        if i == 0:
+            st.write("No players selected for comparison.")
+            return
+        cols = st.columns(i)
+        for idx, col in enumerate(cols):
+            player_name = selected_name_var[idx]
+            loop_df = carolina_players_all_situations[carolina_players_all_situations['name'] == player_name]
+            with col:
+                st.image(loop_df['photos'].iloc[0], width=100)
+                st.write(player_name)
 
     autocolumn(length_selected_names)
-
-    # store selected values in session state
-    st.session_state.selected_name_var = selected_name_var
 
     # Filter Dataset1 based on names selected
     filtered_df1 = carolina_players_all_situations[carolina_players_all_situations['name'].isin(selected_name_var)]
     filtered_df1 = filtered_df1.sort_values('name', key=lambda x: pd.Categorical(x, categories=selected_name_var, ordered=True))
 
-    #create columns
+    # Create visualizations
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("**Player Expected Goal Percentage**",divider='red',)
+        st.subheader("**Player Expected Goal Percentage**", divider='red')
         # Bar Chart to compare Goals / Expected Goals
         expected_goal_chart = alt.Chart(filtered_df1).mark_bar().encode(
-            x=alt.X('name', axis=alt.Axis(labelAngle=-90,title=""), sort = filtered_df1['name']).title("Name"),
+            x=alt.X('name', axis=alt.Axis(labelAngle=-90, title=""), sort=filtered_df1['name']).title("Name"),
             y='Expected Goal %'
         )
         # Created Data Labels Chart for Player Expected Goal %
         expected_goal_text = expected_goal_chart.mark_text(
             baseline='middle',
-            dy=-7.5 
+            dy=-7.5
         ).encode(
-            text ='Expected Goal %'
+            text='Expected Goal %'
         )
         # Combine Chart and Data Labels into Layers
         bar_chart1 = (expected_goal_chart + expected_goal_text
@@ -431,18 +254,18 @@ def compare_page():
         )
         st.altair_chart(bar_chart1, use_container_width=True)
     with col2:
-        st.subheader("**Player Expected High Danger Goals Percentage**",divider='red')
+        st.subheader("**Player Expected High Danger Goals Percentage**", divider='red')
         # Bar Chart to compare High Danger Goals / Expected High Danger Goals
         high_danger_chart = alt.Chart(filtered_df1).mark_bar().encode(
-            x=alt.X('name', axis=alt.Axis(labelAngle=-90,title=""), sort = filtered_df1['name']).title("Name"),
+            x=alt.X('name', axis=alt.Axis(labelAngle=-90, title=""), sort=filtered_df1['name']).title("Name"),
             y='Finishing Expected High Danger %'
         )
         # Created Data Labels Chart for High Danger Expected %
         high_danger_text = high_danger_chart.mark_text(
             baseline='middle',
-            dy=-7.5 
+            dy=-7.5
         ).encode(
-            text ='Finishing Expected High Danger %'
+            text='Finishing Expected High Danger %'
         )
         # Combine Chart and Data Labels into Layers
         bar_chart2 = (high_danger_chart + high_danger_text
@@ -452,17 +275,17 @@ def compare_page():
             height=350
         )
         st.altair_chart(bar_chart2, use_container_width=True)
-    
+
     # Filter Dataset2 based on names selected
     filtered_df2 = carolina_players_other_situations[carolina_players_other_situations['name'].isin(selected_name_var)]
     filtered_df2 = filtered_df2.sort_values('name', key=lambda x: pd.Categorical(x, categories=selected_name_var, ordered=True))
     filtered_df2.rename(columns={'I_F_goals': 'Goals'}, inplace=True)
 
     # Create Other Situations Goals and Assists
-    st.subheader("**Goals in Different Scenarios**",divider='red')
+    st.subheader("**Goals in Different Scenarios**", divider='red')
     # Bar Chart to compare High Danger Goals / Expected High Danger Goals
     situationschart = alt.Chart(filtered_df2).encode(
-        x=alt.X('name', axis=alt.Axis(labelAngle=-90,title=""), sort = filtered_df1['name']).title("Name"),
+        x=alt.X('name', axis=alt.Axis(labelAngle=-90, title=""), sort=filtered_df1['name']).title("Name"),
         xOffset='situation',
         y='Goals',
     ) 
@@ -475,11 +298,11 @@ def compare_page():
         dx=5,
         dy=-5,
     ).encode(
-        text ='Goals'
+        text='Goals'
     )
     # Print Goals in Situations 
-    st.altair_chart(situationschart_color+situationschart_text, use_container_width=True)  
- 
+    st.altair_chart(situationschart_color + situationschart_text, use_container_width=True)
+
 def team_stats():
     # create team stats dataframe for the 2023/2024 Season. Could do all years but this site is focused on one season.
     team_data = pd.read_csv('Carolina Hurricanes.csv')
