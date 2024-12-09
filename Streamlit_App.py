@@ -39,8 +39,13 @@ compare_page_buttom = st.sidebar.button(
     "Player Comparison".upper(), on_click=switch_page, args=["compare_page"]
 )
 
-#Import Players Data
-players = pd.read_csv('skaters 23-24.csv')
+@st.cache_data  # 👈 Add the caching decorator
+def load_data(url):
+    df = pd.read_csv(url)
+    return df
+
+#Import Players Data with changes
+players = load_data('skaters 23-24.csv')
 carolina_players = players[players['team'] == 'CAR']
 carolina_players_all_situations = carolina_players[carolina_players['situation'] == 'all']
 carolina_players_other_situations = carolina_players[carolina_players['situation'] != 'all']
@@ -193,8 +198,7 @@ def compare_page():
         max_selections=10,
         placeholder = 'Choose a Player',
         default = ['Sebastian Aho', 'Seth Jarvis', 'Andrei Svechnikov']  
-    )
-
+    ) 
 
     length_selected_names = len(selected_name_var)
     # create loop for dynamic columns based on length of selected names list
